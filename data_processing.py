@@ -29,6 +29,8 @@ def process_blocks(blocks_list: list[TextBlock]) -> list[tuple[int, list[Sentenc
     """
     Processes the text_blocks returned from the csv file and returns a tuple containing an id and
     list of their sentences
+
+    [id, [list of Sentences]
     """
     # TODO: take each text block and create a list of sentences within it.
 
