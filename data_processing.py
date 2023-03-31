@@ -8,9 +8,6 @@ import string
 def read_csv(csv_file: str) -> list[TextBlock]:
     """Load network and packet data from a CSV file.
 
-       Return a TODO of two values:
-           - TODO
-
        Preconditions:
            - csv_file refers to a valid CSV file in the format described on the project handout
 
@@ -70,14 +67,18 @@ class TextBlock:
     - id: a unique identifier of a textblock
     - author: the name of the person who wrote the excerpt
     - title: the title of the book
-    - url:
+    - url: a link to an online copy of the book
     - pub_year: the year of publication of the book, if pub_year = 0, then the publishing year is unknown
-    - category:
-    - location:
+    - category: the genre of the novel, either literature or informative
+    - location: the place in the novel where the excerpt is taken from
     - excerpt: a portion of the book
-    - carec_m:
+    - carec_m: the Crowdsourced Algorithm of Reading Comprehension (CAREC) of the novel
     - sentence_count: the number of sentences in the excerpt
 
+    Preconditions:
+    - self.category in {'Lit', 'Info'}
+    - self.location in {'start', 'end', 'mid', 'whole'}
+    - -1 <= self.carec_m <= 1
     """
     id: int
     author: str
@@ -105,7 +106,11 @@ class TextBlock:
         self.sentence_count = sentence_count
 
     def average_sentence_length(self) -> float:
-        """Returns the average number of words in a sentence."""
+        """Returns the average number of words in a sentence.
+
+        Preconditions:
+        - self.average_sentence_length >= 0
+        """
         counter = 0
         sum_so_far = 0
         for i in self.excerpt:
@@ -120,6 +125,9 @@ class Sentence:
 
     Instance Attributes:
     - phrase: a sentence in str form
+    - id: the id of the TextBlock that this Sentence originated from
+    - location: the location of the TextBlock that this Sentence originated from
+    - carec_m: the carec_m of the TextBlock that this Sentence originated from
     - word_count: the number of words in the phrase
 
     Preconditions:
