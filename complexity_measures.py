@@ -1,5 +1,6 @@
 """Given a syntax tree, these are implementations of the different collections of complexity measures"""
 
+
 def dale_chall_complexity(text: TextBlock) -> float:
     """
     Returns the reading grade of a reader who can comprehend your text.
@@ -17,18 +18,51 @@ def dale_chall_complexity(text: TextBlock) -> float:
 
     Adjusted Score = Reading Grade of a reader who can comprehend your text at 4th grade or above.
     """
-    # calculate percentage of difficult words
+    reading_scores_per_sent = []
+    PDW_per_sentence = []
+    num_diff_words = 0
 
+    word_list = dale_chall_word_list("Dale-Chall Familiar Words")
+    for sentence in text.sentences:
+        # calculate percentage of difficult words
+        words = sentence.sentence_to_list()
+        num_unfamiliar = 0
+        for word in words:
+            if word not in word_list:
+                num_unfamiliar += 1
+
+        # sentence num_unfamiliar percentage:
+        PDW_per_sentence += num_unfamiliar / len(words)
+        num_diff_words += num_unfamiliar
 
     # calculate average sentence length
+    num_words = sum(len(sentence.sentence_to_list()) for sentence in text.sentences)
+    ASL = num_words / len(text.sentences)
+    PDW = num_diff_words / num_words
 
+    # Calculate Score
+    score = 0.1579 * (PDW) + 0.0496 * ASL
+
+    if PDW > 0.05:
+        score += 3.6365
+
+    return score
 
 
 def dale_chall_word_list(csv_file: str) -> set[str]:
     """
     Given a text file containing all the Dale Chall familiar words, return a set of those words.
     """
+    with open(csv_file) as csv_fle:
+        reader = csv.reader(csv_fle)
+        headers = next(reader)
 
+        word_set = set()
+        for row in reader:
+            # add to word_set
+            word_set.add(str(row))
+
+    return word_set
 
 
 #--------------------------------------------------------------------
@@ -46,6 +80,9 @@ def flesch_complexity_score(text: TextBlock) -> float:
     # compute average num of syllables per word.
 
 
+    # calculate average sentence length
+    num_words = sum(len(sentence.sentence_to_list()) for sentence in text.sentences)
+    ASL = num_words / len(text.sentences)
 
 
 def num_syllables(word: str) -> int:
