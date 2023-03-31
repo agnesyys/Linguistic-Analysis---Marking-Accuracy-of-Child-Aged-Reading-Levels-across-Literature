@@ -24,7 +24,7 @@ def tag_sentence(sentence: str) -> nltk.tree:
     - "." in sentence only once (TODO: Python code)
     """
     # Find all parts of speech in given sentence
-    return pos_tag(word_tokenize(sample_text))
+    return pos_tag(word_tokenize(sentence))
 
 
 def create_tree(tagged_sentence: nltk.tree) -> nltk.tree:
