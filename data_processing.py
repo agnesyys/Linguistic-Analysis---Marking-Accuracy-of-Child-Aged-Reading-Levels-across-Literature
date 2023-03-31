@@ -2,6 +2,7 @@
 from __future__ import annotations
 import csv
 from typing import Optional
+import string
 
 
 def read_csv(csv_file: str) -> list[TextBlock]:
@@ -31,12 +32,17 @@ def read_csv(csv_file: str) -> list[TextBlock]:
             # Create a Sentence for each sentence
             sentences = []
             for i in range(0, len(periods) - 1):
-                sentences.append(Sentence(row[7][periods[i]: periods[i + 1]], word_count=len(row[7].split(' '))))
+                sentences.append(Sentence(phrase=row[7][periods[i]: periods[i + 1]], id=int(row[0]), location=row[6],
+                                          carec_m=float(row[8])))
+                sentences[-1].word_count = sentences[-1].calculate_word_count()
 
             # initialize a text_block with the unique information of each text
-            TextBlock(id=int(row[0]), author=row[1], title=row[2], url=row[3], pub_year=int(row[4]),
-                      category=row[5], location=row[6], excerpt=sentences, carec_m=float(row[8]),
-                      sentence_count=counter)
+            list_of_text_blocks.append(TextBlock(id=int(row[0]), author=row[1], title=row[2], url=row[3],
+                                                 category=row[5], location=row[6], excerpt=sentences,
+                                                 carec_m=float(row[8]),
+                                                 sentence_count=counter))
+            if row[4] != '':
+                list_of_text_blocks[-1].pub_year = row[4]
     # return a list of TextBlocks
     return list_of_text_blocks
 
@@ -46,12 +52,13 @@ def process_blocks(blocks_list: list[TextBlock]) -> list[tuple[int, list[Sentenc
     Processes the text_blocks returned from the csv file and returns a tuple containing an id and
     list of their sentences
 
-    [id, [list of Sentences]
+    Format: [id, [list of Sentences]]
     """
     identifier = 0
     new_lst = []
     for i in blocks_list:
         new_lst.append((identifier, i.excerpt))
+        identifier += 1
     return new_lst
 
 
@@ -64,7 +71,7 @@ class TextBlock:
     - author: the name of the person who wrote the excerpt
     - title: the title of the book
     - url:
-    - pub_year: the year of publication of the book
+    - pub_year: the year of publication of the book, if pub_year = 0, then the publishing year is unknown
     - category:
     - location:
     - excerpt: a portion of the book
@@ -76,15 +83,15 @@ class TextBlock:
     author: str
     title: str
     url: str
-    pub_year: int
+    pub_year: Optional[int]
     category: str
     location: str
     excerpt: list[Sentence]
     carec_m: float
     sentence_count: int
 
-    def __init__(self, id: int, author: str, title: str, url: str, pub_year: int, category: str, location: str,
-                 excerpt: list[Sentence], carec_m: float, sentence_count: int):
+    def __init__(self, id: int, author: str, title: str, url: str, category: str, location: str,
+                 excerpt: list[Sentence], carec_m: float, sentence_count: int, pub_year: Optional[int] = 0, ):
         """initializes the instance attributes of TextBlock"""
         self.id = id
         self.author = author
@@ -98,7 +105,7 @@ class TextBlock:
         self.sentence_count = sentence_count
 
     def average_sentence_length(self) -> float:
-        """Returns the average number of words in a sentence"""
+        """Returns the average number of words in a sentence."""
         counter = 0
         sum_so_far = 0
         for i in self.excerpt:
@@ -117,30 +124,39 @@ class Sentence:
 
     Preconditions:
     - self.phrase[-1] == '.' or self.phrase[-1] == '?' or self.phrase[-1] == '!'
-    - self.word_count > 0 or self.word_count is None
+    - len(self.phrase) > 0
+    - self.word_count > 0
 
     """
     phrase: str
-    # id: int
-    # location: str
-    # carec_m: float
+    id: int
+    location: str
+    carec_m: float
     word_count: Optional[int]
 
-    def __init__(self, phrase: str, word_count: Optional[int] = None):
-        """initializes the instance attributes of Sentence"""
+    def __init__(self, phrase: str, id: int, location: str, carec_m: float):
+        """initializes the instance attributes of Sentence."""
         self.phrase = phrase
-        # self.id = id
-        # self.location = location
-        # self.carec_m = carec_m
-        self.word_count = word_count
+        self.id = id
+        self.location = location
+        self.carec_m = carec_m
+        self.word_count = self.calculate_word_count()
 
-    def word_count(self):
-        """returns number of words in sentence"""
+    def calculate_word_count(self) -> int:
+        """Returns number of words in sentence.
+
+        Preconditions:
+        - self.calculate_word_count() > 0
+        """
         return len(self.phrase.split(' '))
 
-    def sentence_to_list(self):
-        """Returns just the words of a sentence. """
-        temp = self.phrase.replace('.', '')
-        temp = temp.replace('!', '')
-        temp = temp.replace('?', '')
-        return temp
+    def sentence_to_list(self) -> list[str]:
+        """Returns just the words of a sentence.
+
+        Preconditions:
+        - len(self.sentence_to_list()) > 0
+        """
+        # for i in '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~':
+        #   temp = self.phrase.replace(i, '')
+        temp = self.phrase.translate(str.maketrans('', '', string.punctuation))
+        return temp.split(' ')
