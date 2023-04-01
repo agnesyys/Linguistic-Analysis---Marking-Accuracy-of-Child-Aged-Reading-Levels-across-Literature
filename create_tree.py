@@ -36,9 +36,11 @@ def nltk_spacy_tree(sentence: str) -> nltk.tree:
     doc = nlp(sentence)
 
     def token_format(token):
+        """return its tokenized format"""
         return "_".join([token.orth_, token.tag_, token.dep_])
 
     def to_nltk_tree(node):
+        """Return its tokenized format"""
         if node.n_lefts + node.n_rights > 0:
             return Tree(token_format(node), [to_nltk_tree(child) for child in node.children])
         else:
