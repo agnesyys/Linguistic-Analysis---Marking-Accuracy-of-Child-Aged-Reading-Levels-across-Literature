@@ -27,24 +27,32 @@ def dependency_diagram(sentence: str) -> None:
         print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_,
               token.shape_, token.is_alpha, token.is_stop)
 
-def nltk_spacy_tree(sentence: str) -> nltk.tree:
+def nltk_spacy_tree(sentence: str, attr_included: bool) -> nltk.tree:
     """
     Visualize the SpaCy dependency tree with nltk.tree
     """
+    # gets all the tokenized info
     doc = nlp(sentence)
 
-    def token_format(token):
-        """return its tokenized format"""
-        return "_".join([token.orth_, token.tag_, token.dep_])
+    def token_format(token, attrib_included):
+        """return its tokenized format, continuous string with all info
+        token.orth_: word (string representation)
+        token.tag_: part of speech
+        token.dep_: dependancy
+        """
+        if attrib_included:
+            return "_".join([token.orth_, token.tag_, token.dep_])
+        else:
+            return token.orth_
 
-    def to_nltk_tree(node):
+    def to_nltk_tree(node, attri_included):
         """Return its tokenized format"""
         if node.n_lefts + node.n_rights > 0:
-            return Tree(token_format(node), [to_nltk_tree(child) for child in node.children])
+            return Tree(token_format(node, attri_included), [to_nltk_tree(child, attr_included) for child in node.children])
         else:
-            return token_format(node)
+            return token_format(node, attri_included)
 
-    tree = [to_nltk_tree(sent.root) for sent in doc.sents]
+    tree = [to_nltk_tree(sent.root, attr_included) for sent in doc.sents]
     # The first item in the list is the full tree
     return tree[0]
     # tree[0].draw()
