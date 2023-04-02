@@ -37,7 +37,8 @@ def read_csv(csv_file: str) -> list[TextBlock]:
             list_of_text_blocks.append(TextBlock(id=int(row[0]), author=row[1], title=row[2], url=row[3],
                                                  category=row[5], location=row[6], excerpt=sentences,
                                                  carec_m=float(row[8]),
-                                                 sentence_count=counter, flesch_reading=row[9], dale_chall=row[10]))
+                                                 sentence_count=counter, flesch_reading=int(row[9]),
+                                                 dale_chall=int(row[10])))
             if row[4] != '':
                 list_of_text_blocks[-1].pub_year = row[4]
     # return a list of TextBlocks
