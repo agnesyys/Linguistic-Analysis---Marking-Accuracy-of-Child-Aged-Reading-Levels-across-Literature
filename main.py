@@ -2,6 +2,8 @@
 import pygame
 import sys
 import pygame_gui
+import plotly.graph_objects as go
+from data_processing import TextBlock, Sentence
 
 import complexity_measures
 
@@ -63,3 +65,14 @@ def get_score():
 
 
 get_score()
+
+
+def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
+    """Display a bar graph of the reading level accuracy of a given sentence."""
+
+    fig = go.Figure(
+        data=[go.Bar(y=[dc, fc, sd, textblock.carec_m], x=['Dale-Chall Complexity', 'Flesch Complexity',
+                                                           'Syntatic Difficulty', 'CAREC_M'])],
+        layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
+    )
+    fig.show()
