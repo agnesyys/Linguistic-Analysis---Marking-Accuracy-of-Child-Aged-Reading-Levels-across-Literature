@@ -81,20 +81,20 @@ class TextBlock:
     - self.location in {'start', 'end', 'mid', 'whole'}
     - -1 <= self.carec_m <= 1
     """
-    id: Optional[int]
-    author: Optional[str]
-    title: Optional[str]
-    url: Optional[str]
-    pub_year: Optional[int]
-    category: Optional[str]
-    location: Optional[str]
+    id: Optional[int] = None
+    author: Optional[str] = None
+    title: Optional[str] = None
+    url: Optional[str] = None
+    pub_year: Optional[int] = None
+    category: Optional[str] = None
+    location: Optional[str] = None
     excerpt: list[Sentence]
-    carec_m: Optional[float]
-    sentence_count: Optional[int]
-    flesch_reading: Optional[float]
-    dale_chall: Optional[float]
+    carec_m: Optional[float] = None
+    sentence_count: Optional[int] = None
+    flesch_reading: Optional[float] = None
+    dale_chall: Optional[float] = None
 
-    def __init__(self, id:  Optional[int], author: Optional[str], title: Optional[str], url: Optional[str],
+    def __init__(self, id: Optional[int], author: Optional[str], title: Optional[str], url: Optional[str],
                  category: Optional[str], location: Optional[str],
                  excerpt: list[Sentence], carec_m: Optional[float], sentence_count: Optional[int],
                  flesch_reading: Optional[float], dale_chall: Optional[float], pub_year: Optional[int] = 0):
@@ -144,12 +144,12 @@ class Sentence:
 
     """
     phrase: str
-    id: int
-    location: str
-    carec_m: float
-    word_count: Optional[int]
+    id: Optional[int] = None
+    location: Optional[str] = None
+    carec_m: Optional[float] = None
+    word_count: Optional[int] = None
 
-    def __init__(self, phrase: str, id: int, location: str, carec_m: float):
+    def __init__(self, phrase: str, id: Optional[int], location: Optional[str], carec_m: Optional[float]):
         """initializes the instance attributes of Sentence."""
         self.phrase = phrase
         self.id = id
