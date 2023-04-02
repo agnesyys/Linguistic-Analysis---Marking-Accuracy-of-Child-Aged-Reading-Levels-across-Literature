@@ -3,6 +3,8 @@ import pygame
 import sys
 import pygame_gui
 import plotly.graph_objects as go
+
+import data_processing
 from data_processing import TextBlock, Sentence
 
 import complexity_measures
@@ -33,16 +35,24 @@ def show_text(text_to_show):
                 pygame.quit()
                 sys.exit()
         screen.fill("white")
-        dc = 'Dale-Chall:'
-        fl = 'Flesch:'
-        cm = 'CAREC_M:'
-        mdd = 'Mean Dependency Distance:'
+
+        new_sentence = Sentence
+        new_sentence.phrase = text_to_show
+        new_textblock = TextBlock
+        new_textblock.excerpt = [new_sentence]
+
+        dc = complexity_measures.dale_chall_complexity(new_textblock)
+        fc = complexity_measures.flesch_complexity_score()
+        cm = get_closest_carec_score(text, )
+        sd = complexity_measures.mean_dependency_distance_sentence()
+
         draw_text('Sentence Complextity Score-', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
-        draw_text(dc, text_font, 'black', 50, 100)
-        draw_text(fl, text_font, 'black', 50, 150)
-        draw_text(cm, text_font, 'black', 50, 200)
-        draw_text(mdd, text_font, 'black', 50, 250)
+        draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
+        draw_text('Flesch:' + str(fc), text_font, 'black', 50, 150)
+        draw_text('CAREC_M:' + str(cm), text_font, 'black', 50, 200)
+        draw_text('Mean Dependency Distance:' + str(sd), text_font, 'black', 50, 250)
         # run plotly
+        display_reading_level_accuracy(new_textblock, dc, fc, sd)
         pygame.display.update()
 
 
@@ -69,10 +79,32 @@ get_score()
 
 def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
     """Display a bar graph of the reading level accuracy of a given sentence."""
-
+    if len(textblock.excerpt) == 1:
+        cm = get_closest_carec_score(textblock, csv_file)
+    else:
+        cm = textblock.carec_m
     fig = go.Figure(
-        data=[go.Bar(y=[dc, fc, sd, textblock.carec_m], x=['Dale-Chall Complexity', 'Flesch Complexity',
-                                                           'Syntatic Difficulty', 'CAREC_M'])],
+        data=[go.Bar(y=[dc, fc, sd, cm], x=['Dale-Chall Complexity', 'Flesch Complexity',
+                                            'Mean Dependency Distance', 'CAREC_M'])],
         layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
     )
     fig.show()
+
+
+def get_closest_carec_score(text: TextBlock, csv_file: str) -> float:
+    """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from csv_file"""
+    closest_txt_blk = text
+    dc = complexity_measures.dale_chall_complexity(text)
+    fc = complexity_measures.flesch_complexity_score(text)
+
+    pos_similar_txt_blk = data_processing.read_csv(csv_file)
+    min_diff = 10000
+    for textblock in pos_similar_txt_blk:
+        diff_dc = dc - textblock.dale_chall
+        diff_fc = fc - textblock.flesch_reading
+        diff = diff_dc + diff_fc
+
+        if diff <= min_diff:
+            closest_txt_blk = textblock
+
+    return closest_txt_blk.carec_m
