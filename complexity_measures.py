@@ -40,7 +40,7 @@ def dale_chall_complexity(text: TextBlock) -> float:
     PDW_per_sentence = []
     num_diff_words = 0
 
-    word_list = dale_chall_word_list("Dale-Chall Familiar Words")
+    word_list = dale_chall_word_list("data/Dale_Chall_Familiar_Words")
     for sentence in text.excerpt:
         # calculate percentage of difficult words
         words = sentence.sentence_to_list()
@@ -50,7 +50,7 @@ def dale_chall_complexity(text: TextBlock) -> float:
                 num_unfamiliar += 1
 
         # sentence num_unfamiliar percentage:
-        PDW_per_sentence += num_unfamiliar / len(words)
+        PDW_per_sentence.append(num_unfamiliar / len(words))
         num_diff_words += num_unfamiliar
 
     # calculate average sentence length
@@ -305,8 +305,6 @@ def standardized_syntax_score(syn_score: float) -> float:
     2.543 - 3: Average Score (8-9th Grade Level)
     3 - 4:  Increased Complexity (10 -12 Grade Level)
     4+:  Multiple Nested Clauses (Graduate Level; these are very rare and convoluted sentences)
-
-
 
     """
     return syn_score
