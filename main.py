@@ -31,13 +31,16 @@ def show_text(text_to_show):
                 pygame.quit()
                 sys.exit()
         screen.fill("white")
+        dc = 'Dale-Chall:'
+        fl = 'Flesch:'
+        cm = 'CAREC_M:'
+        mdd = 'Mean Dependency Distance:'
         draw_text('Sentence Complextity Score-', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
-        draw_text('Dale-Chall:', text_font, 'black', 50, 100)
-        draw_text('Flesch:', text_font, 'black', 50, 150)
-        draw_text('Syntatic Difficulty:', text_font, 'black', 50, 200)
-        draw_text('CAREC_M:', text_font, 'black', 50, 250)
-        draw_text('Mean Dependency Distance:', text_font, 'black', 50, 300)
-
+        draw_text(dc, text_font, 'black', 50, 100)
+        draw_text(fl, text_font, 'black', 50, 150)
+        draw_text(cm, text_font, 'black', 50, 200)
+        draw_text(mdd, text_font, 'black', 50, 250)
+        # run plotly
         pygame.display.update()
 
 
