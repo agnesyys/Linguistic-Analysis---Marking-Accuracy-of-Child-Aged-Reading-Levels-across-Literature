@@ -36,9 +36,9 @@ def show_text(text_to_show):
                 sys.exit()
         screen.fill("white")
 
-        new_sentence = Sentence(text_to_show)
+        new_sentence = Sentence(text_to_show, None, None, None)
         new_sentence.phrase = text_to_show
-        new_textblock = TextBlock([new_sentence])
+        new_textblock = TextBlock([new_sentence], None, None, None, None, None, None, None, None, None, None)
         new_textblock.excerpt = [new_sentence]
 
         dc = complexity_measures.dale_chall_complexity(new_textblock)
