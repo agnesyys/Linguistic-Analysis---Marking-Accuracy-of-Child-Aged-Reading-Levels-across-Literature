@@ -1,12 +1,11 @@
 """Creating a tree from a sentence using spacy"""
 import nltk
-# Import required libraries
 import spacy
 from nltk import Tree
 from spacy import displacy
 from pathlib import Path
 
-# spacy.cli.download("en_core_web_sm")
+spacy.cli.download("en_core_web_sm")
 nlp = spacy.load("en_core_web_sm")
 
 
