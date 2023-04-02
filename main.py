@@ -38,6 +38,7 @@ def show_text(text_to_show):
 
         new_sentence = Sentence(text_to_show, None, None, None)
         new_sentence.phrase = text_to_show
+
         new_textblock = TextBlock([new_sentence], None, None, None, None, None, None, None, None, None, None)
         new_textblock.excerpt = [new_sentence]
 
