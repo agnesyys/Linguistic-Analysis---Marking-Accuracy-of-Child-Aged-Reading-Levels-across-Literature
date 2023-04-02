@@ -37,7 +37,7 @@ def read_csv(csv_file: str) -> list[TextBlock]:
             list_of_text_blocks.append(TextBlock(id=int(row[0]), author=row[1], title=row[2], url=row[3],
                                                  category=row[5], location=row[6], excerpt=sentences,
                                                  carec_m=float(row[8]),
-                                                 sentence_count=counter))
+                                                 sentence_count=counter, flesch_reading=row[9], dale_chall=row[10]))
             if row[4] != '':
                 list_of_text_blocks[-1].pub_year = row[4]
     # return a list of TextBlocks
@@ -90,9 +90,12 @@ class TextBlock:
     excerpt: list[Sentence]
     carec_m: float
     sentence_count: int
+    flesch_reading: float
+    dale_chall: float
 
     def __init__(self, id: int, author: str, title: str, url: str, category: str, location: str,
-                 excerpt: list[Sentence], carec_m: float, sentence_count: int, pub_year: Optional[int] = 0, ):
+                 excerpt: list[Sentence], carec_m: float, sentence_count: int,
+                 flesch_reading: float, dale_chall: float, pub_year: Optional[int] = 0):
         """initializes the instance attributes of TextBlock"""
         self.id = id
         self.author = author
@@ -104,6 +107,8 @@ class TextBlock:
         self.excerpt = excerpt
         self.carec_m = carec_m
         self.sentence_count = sentence_count
+        self.flesch_reading: flesch_reading
+        self.dale_chall: dale_chall
 
     def average_sentence_length(self) -> float:
         """Returns the average number of words in a sentence.

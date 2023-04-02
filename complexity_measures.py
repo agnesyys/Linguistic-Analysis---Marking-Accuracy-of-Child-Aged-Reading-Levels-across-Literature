@@ -1,19 +1,24 @@
-"""Given a syntax tree, these are implementations of the different collections of complexity measures"""
+"""
+This file contains the implementations for the three different complexity measures:
+
+Dale_Chall: Complexity measured by ratio of unfamiliar words to overall words
+
+Flesch-Kincaid: Complexity measured by average number of syllables per word and average number of words per sentence
+
+Mean Dependency Distance (MDD): Visualizing the dependency relations of each word in a sentence as a syntax tree,
+MDD measures the distance between every parent-child pair.
+
+Also included:
+Standardizers for each scoring system. Each returns a value measured on a different scale,
+so this returns all the scores as a value between 0 and 1.
+"""
 from data_processing import TextBlock, Sentence
-import create_tree as ct
 import csv
-
-import nltk
-# Import required libraries
-import spacy
-from nltk import Tree
-from spacy import displacy
-from pathlib import Path
-
-# spacy.cli.download("en_core_web_sm")
-nlp = spacy.load("en_core_web_sm")
 from typing import Any, Optional
+import create_tree as ct
 
+
+# DALE_CHALL IMPLEMENTATION (complexity, unfamiliar words list initializer, and score standardizer)
 def dale_chall_complexity(text: TextBlock) -> float:
     """
     Returns the reading grade of a reader who can comprehend your text.
@@ -78,7 +83,28 @@ def dale_chall_word_list(csv_file: str) -> set[str]:
     return word_set
 
 
-# --------------------------------------------------------------------
+
+def standardized_dale_chall(dc_score: float) -> float:
+    """Standardizes DC score using the following metric:
+
+    DC Score Scale:
+    4.9 and Below	Grade 4 and Below
+    5.0 to 5.9	    Grades 5 - 6
+    6.0 to 6.9	    Grades 7 - 8
+    7.0 to 7.9	    Grades 9 - 10
+    8.0 to 8.9	    Grades 11 - 12
+    9.0 to 9.9	    Grades 13 - 15 (College)
+    10 and Above	Grades 16 and Above (College Graduate)
+
+    Adjusted to 1.0 Scale:
+    TODO: figure out scale
+
+
+    """
+    return dc_score / 10
+
+
+# FLESCH READING EASE SCORE IMPLEMENTATION (complexity, syllable counter, standardizer)
 def flesch_complexity_score(text: TextBlock) -> float:
     """
     Return the Flesch Reading Ease Readability Formula
@@ -112,9 +138,11 @@ def flesch_complexity_score(text: TextBlock) -> float:
 def num_syllables(word: str) -> int:
     """Using English rules for syllabififcation:
 
-    each vowel in a word is considered one syllable subject to: (a) -es, -ed and -e (except -le) endings are ignored;
-    (b) words of three letters or shorter count as single syllables; and (c) consecutive vowels count as one syllable
-
+    From the Flesch Reading Ease Formula:
+    each vowel in a word is considered one syllable subject to:
+    (a) -es, -ed and -e (except -le) endings are ignored;
+    (b) words of three letters or shorter count as single syllables; and
+    (c) consecutive vowels count as one syllable
     """
     vowels = {"a", "e", "i", "o", "u"}
     length = len(word)
@@ -136,8 +164,44 @@ def num_syllables(word: str) -> int:
 
     return syll_num
 
-# -----------------------------------------
-def mean_dependency_distance(sentence: str):
+def standardized_flesch_ease(fe_score: float) -> float:
+    """Standardizes FE score using the following metric:
+
+    FE Scaling System
+    90 - 100: Grade 5
+    80 - 90:  Grade 6
+    70 - 80:  Grade 7
+    60 - 70:  Grade 8-9
+    50 - 60:  Grade 10 - 12
+    30 - 50:  Grades 13 - 15 (College)
+    0 - 30:   Grades 16 and Above (College Graduate)
+
+    Standardized Scoring:
+
+
+    """
+    return fe_score
+
+# Dependency Distance Scoring (Text-block implementation, sentence scoring, dependency (tree parsing), flatten helper)
+
+# Note that this uses the NLTK & Spacy Implementations in create_tree
+# to tokenize words and create the tree for each sentence
+
+
+def mean_dependency_distance(text_block: TextBlock) -> float:
+    """ Calculates the mean dependency distance (MDD) for a text block
+    by finding the average MDD of each of its sentences.
+
+    Notes on how MDD is determined in function mean_dependency_distance_sentence()
+    """
+    MDD_lists = []
+    for sentence in text_block.excerpt:
+        MDD_lists.append(mean_dependency_distance_sentence(sentence))
+
+    return sum(MDD_lists) / text_block.sentence_count
+
+
+def mean_dependency_distance_sentence(sentence: Sentence) -> float:
     """Calculates the mean_dependency_distance given a sentence
 
     The Mean Dependency Distance (MDD) is:
@@ -160,7 +224,7 @@ def mean_dependency_distance(sentence: str):
     # Generally: this function calculates the distance between each word and its dependent in the sentence,
     # by traversing through the tree.
     # to calculate MDD, we begin with creating a dependency tree.
-    tree = nltk_spac_tree(sentence, False)
+    tree = ct.nltk_spacy_tree(sentence.phrase, False)
     # tree.pretty_print()
 
     # Then, for each word in the tree, which we refer to as the ith word based on sentence position
@@ -172,67 +236,57 @@ def mean_dependency_distance(sentence: str):
     # Since dependency tree is formed left to right, going from i =0  to i = len(sentence) - 1
     # will maintain the order in case of duplicates
     distances = []
-    for i in range(0, len(sentence), 2):
-        distances.append(abs(sentence.index(dependents[i], i - 1) - sentence.index(dependents[i + 1], i - 1)))
+    for i in range(0, sentence.calculate_word_count(), 2):
+        distances.append(abs(sentence.phrase.index(dependents[i], i - 1)
+                             - sentence.phrase.index(dependents[i + 1], i - 1)))
 
     # lastly, summ all DDs and divide by num of words in sentence
-    return sum(distances) / len(sentence)
+    return sum(distances) * 1 / (sentence.calculate_word_count() - 1)
 
 
-def get_dependents(tree: nltk.tree) -> list[list[nltk.tree]] | None:
+def get_dependents(tree: ct.nltk.tree) -> list[list[ct.nltk.tree]] | None:
     """Get dependents in pairs
 
-    Note that the NLTK built-in methods for nltk.tree in this function add the following conditions:
+    Note that the NLTK built-in methods for ct.nltk.tree in this function add the following conditions:
     tree.subtrees() returns ALL the constituent trees, this includes the subtrees of its subtrees (and so on).
     It does not return ANY leaves, even those which are direct children of the tree's root.
     It also returns itself as one of the listed subtrees.
 
-    tree.leaves() returns ALL the leaves across the full tree, i.e all the descendants which are leaves
+    tree.leaves() returns ALL the leaves across the full tree, ie all the descendants which are leaves
 
-    tree.label() is analogous to the in-class tree.root, and returns the root value of the tree
+    tree.label() is analogous to the in-class tree._root, and returns the root value of the tree
     """
     # Then, for each word in the tree, which we refer to as the ith word based on sentence position,
     tree_root = tree.label()
     dependents = []
 
     # we need to get, for every subtree, the distance between root and children if there is a direct child leaf.
+    # If the tree has leaves, cycle through the leaves in its subtrees, and collect all the leaves that are not also
+    # leaves of its subtrees (these are the ones which are direct children of the root
+
     if len(tree.leaves()) >= 1:
-        # all leaves, direct subs are not included
         for leaf in tree.leaves():
             subtrees_sans_original = [subtree for subtree in tree.subtrees() if subtree.label() != tree.label()]
             direct_leaf_condition = not any(leaf in subtree.leaves() for subtree in subtrees_sans_original)
             if direct_leaf_condition:
                 dependents.append([tree_root, leaf])
 
+    # Iterate through all subtrees (note that leaves are not included here), and if the subtree is not itself,
+    # store the subtree's root and this tree's root in list of dependents
+    # Recurse into the subtree to collect all the parent-child pairs inside
     for subtree in tree.subtrees():
         if subtree.label() != tree_root:
             # create a pair with root and every child, confirm that the subtree is a direct child of tree
             subtree_direct_child_of_tree_root = []
             if subtree_direct_child_of_tree_root:
                 dependents.append([subtree.label(), tree_root])
-            print([subtree.label(), tree_root])
             dependents.append(get_dependents(subtree))
 
     return dependents
 
-def is_empty(tree) -> bool:
-    """Return whether this tree is empty.
-    """
-    return tree.label() is None
-
-def len_tree(tree: nltk.tree):
-    if tree.leaves() == []:
-        return 0
-    else:
-        size = 1  # count the root
-        for subtree in tree.subtrees():
-            size += len_tree(subtree)  # could also write len(subtree)
-        return size
 
 def flatten(nested_list: str | list, unnested: list) -> None:
-    """Return the items of the given nested list.
-
-    This version uses a comprehension and the built-in sum aggregation function.
+    """Mutate the given unnested list variable to store the items of the given nested list, unnested.
     """
     if isinstance(nested_list, str):
         unnested.append(nested_list)
@@ -240,64 +294,17 @@ def flatten(nested_list: str | list, unnested: list) -> None:
         unnested.append(flatten(sublist, []) for sublist in nested_list)
 
 
-def nltk_spac_tree(sentence: str, attr_included: Optional[bool] = False) -> nltk.tree:
-    """
-    Visualize the SpaCy dependency tree with nltk.tree
-    """
-    # gets all the tokenized info
-    doc = nlp(sentence)
-    tree = [to_nltk_tree(sentence.root, attr_included) for sentence in doc.sents]
-    # The first item in the list is the full tree
-    return tree[0]
-    # tree[0].draw()
-
-def to_nltk_tree(node, attri_included):
-    """Return its tokenized format"""
-    if node.n_lefts + node.n_rights > 0:
-        return Tree(token_format(node, attri_included), [to_nltk_tree(child, attri_included) for child in node.children])
-    else:
-        return token_format(node, attri_included)
-
-def token_format(token, attrib_included):
-    """return its tokenized format as a continuous string with all info
-    token.orth_: word (string representation)
-    token.tag_: part of speech
-    token.dep_: dependancy
-    """
-    if attrib_included:
-        return "_".join([token.orth_, token.tag_, token.dep_])
-    else:
-        return token.orth_
-
-
-
-# TODO: standardize complexity measures scale
-def standardized_dale_chall(dc_score: float) -> float:
-    """Standardizes DC score using the following metric:
-
-
-
-
-
-    """
-    return dc_score
-
-
-def standardized_flesch_kincaid(fk_score: float) -> float:
-    """Standardizes FK score using the following metric:
-
-
-
-
-
-    """
-    return fk_score
-
-
 def standardized_syntax_score(syn_score: float) -> float:
-    """Standardizes FK score using the following metric:
+    """Standardizes syntax dependency score using the following metric:
 
+    MDD Scores follow the following scale:
 
+    < 1: Very Simple Sentences (<4th Grade LeveL) -> For context, these are sentences like "She danced."
+    1 - 2: Simple Sentence (4-6 Grade Level)       -> For context, this would be "The girl ate an apple."
+    2 - 2.5: More Complex (Multiple Verbs)          -> "She fights like the wind when she is fighting angrily"
+    2.543 - 3: Average Score (8-9th Grade Level)
+    3 - 4:  Increased Complexity (10 -12 Grade Level)
+    4+:  Multiple Nested Clauses (Graduate Level; these are very rare and convoluted sentences)
 
 
 
