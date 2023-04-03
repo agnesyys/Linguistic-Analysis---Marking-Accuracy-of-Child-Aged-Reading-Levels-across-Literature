@@ -66,7 +66,7 @@ def show_text(text_to_show):
         dc = com_m.standardized_dale_chall(com_m.dale_chall_complexity(new_textblock))
         fc = com_m.standardized_flesch_ease(com_m.flesch_complexity_score(new_textblock))
         cm = get_closest_carec_score(new_textblock)
-        sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock))
+        sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock, True))
 
         draw_text('Sentence Complextity Score-', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
         # draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
@@ -76,6 +76,20 @@ def show_text(text_to_show):
         # run plotly
         display_reading_level_accuracy(new_textblock, dc, fc, sd)
         pygame.display.update()
+
+
+def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
+    """Display a bar graph of the reading level accuracy of a given sentence."""
+    if len(textblock.excerpt) == 1:
+        cm = get_closest_carec_score(textblock)
+    else:
+        cm = textblock.carec_m
+    fig = go.Figure(
+        data=[go.Bar(y=[dc, fc, sd, cm], x=['Dale-Chall Complexity', 'Flesch Complexity',
+                                            'Mean Dependency Distance', 'CAREC_M'])],
+        layout_title_text="Reading Levels Accuracy Compared to CAREC M"
+    )
+    fig.show()
 
 
 def get_score():
@@ -97,17 +111,3 @@ def get_score():
 
 
 get_score()
-
-
-def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
-    """Display a bar graph of the reading level accuracy of a given sentence."""
-    if len(textblock.excerpt) == 1:
-        cm = get_closest_carec_score(textblock)
-    else:
-        cm = textblock.carec_m
-    fig = go.Figure(
-        data=[go.Bar(y=[dc, fc, sd, cm], x=['Dale-Chall Complexity', 'Flesch Complexity',
-                                            'Mean Dependency Distance', 'CAREC_M'])],
-        layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
-    )
-    fig.show()
