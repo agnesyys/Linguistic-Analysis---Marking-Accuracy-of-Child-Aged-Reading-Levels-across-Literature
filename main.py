@@ -29,7 +29,7 @@ def draw_text(text, font, text_col, x, y):
     screen.blit(img, (x, y))
 
 def get_closest_carec_score(text: TextBlock) -> float:
-    """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from csv_file"""
+    """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from data_set_novels.csv"""
     closest_txt_blk = text
     dc = complexity_measures.dale_chall_complexity(text)
     fc = complexity_measures.flesch_complexity_score(text)
