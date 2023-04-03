@@ -1,4 +1,7 @@
-"""
+"""CSC111 Winter 2023
+
+Instructions (READ THIS FIRST!)
+===============================
 This file contains the implementations for the three different complexity measures:
 
 Dale_Chall: Complexity measured by ratio of unfamiliar words to overall words
@@ -11,10 +14,14 @@ MDD measures the distance between every parent-child pair.
 Also included:
 Standardizers for each scoring system. Each returns a value measured on a different scale,
 so this returns all the scores as a value between 0 and 1.
+
+Copyright and Usage Information
+===============================
+
+This file is Copyright (c) 2023 Lana Wehbeh, Mikayla Pradeepan, and Agnes Yau.
 """
 from data_processing import TextBlock, Sentence
 import csv
-from typing import Any, Optional
 import create_tree as ct
 
 
@@ -36,7 +43,6 @@ def dale_chall_complexity(text: TextBlock) -> float:
 
     Adjusted Score = Reading Grade of a reader who can comprehend your text at 4th grade or above.
     """
-    reading_scores_per_sent = []
     PDW_per_sentence = []
     num_diff_words = 0
 
@@ -78,7 +84,7 @@ def dale_chall_word_list(csv_file: str) -> set[str]:
         word_set = set()
         for row in reader:
             # add to word_set
-            word_set.add(str(row))
+            word_set.add(str(row[0]))
 
     return word_set
 
@@ -396,3 +402,16 @@ def standardized_syntax_score(syn_score: float) -> int:
         return 15
     else:
         return 16
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run both pytest and PythonTA,
+    # and then also test your methods manually in the console.
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120
+    })

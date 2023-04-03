@@ -1,4 +1,4 @@
-def get_most_similar(TextBlock: TeaxtBlock(Sentence("text sentence here"))):
+def get_most_similar(TextBlock: TextBlock(Sentence("text sentence here"))):
     dale_chall_complexity(text)
     flesch_reading_ease(text)
 
