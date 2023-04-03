@@ -38,6 +38,8 @@ def get_closest_carec_score(text: TextBlock) -> float:
     pos_similar_txt_blk = data_processing.read_csv('data/data_set_novels.csv')
     min_diff = 10000
     for textblock in pos_similar_txt_blk:
+        print(textblock.dale_chall)
+        print(textblock.flesch_reading)
         if (textblock.dale_chall and textblock.flesch_reading) is not None:
             diff_dc = dc - textblock.dale_chall
             diff_fc = fc - textblock.flesch_reading
@@ -91,8 +93,10 @@ def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, s
     fig = go.Figure(
         data=[go.Bar(y=[dc, fc, sd, cm], x=['Dale-Chall Complexity', 'Flesch Complexity',
                                             'Mean Dependency Distance', 'CAREC_M'])],
-        layout_title_text="Reading Levels Accuracy Compared to CAREC M"
-    )
+        layout_title_text="Reading Levels Accuracy Compared to CAREC M", )
+    fig.update_layout(xaxis_title="Sentence Complexity Measures",
+                      yaxis_title="Score",
+                      title_x=0.5)
     fig.show()
 
 
