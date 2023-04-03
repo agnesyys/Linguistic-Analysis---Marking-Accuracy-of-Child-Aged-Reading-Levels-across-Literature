@@ -8,6 +8,7 @@ import data_processing
 from data_processing import TextBlock, Sentence
 
 import complexity_measures
+com_m = complexity_measures
 
 pygame.init()
 width = 600
@@ -26,6 +27,25 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
+def get_closest_carec_score(text: TextBlock) -> float:
+    """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from csv_file"""
+    closest_txt_blk = text
+    dc = complexity_measures.dale_chall_complexity(text)
+    fc = complexity_measures.flesch_complexity_score(text)
+
+    pos_similar_txt_blk = data_processing.read_csv('data/data_set_novels.csv')
+    min_diff = 10000
+    for textblock in pos_similar_txt_blk:
+        if (textblock.dale_chall and textblock.flesch_reading) is not None:
+            diff_dc = dc - textblock.dale_chall
+            diff_fc = fc - textblock.flesch_reading
+            diff = diff_dc + diff_fc
+
+            if diff <= min_diff:
+                closest_txt_blk = textblock
+
+    return closest_txt_blk.carec_m
+
 
 def show_text(text_to_show):
     """after input sentence"""
@@ -42,13 +62,13 @@ def show_text(text_to_show):
         new_textblock = TextBlock([new_sentence], None, None, None, None, None, None, None, None, None, None)
         new_textblock.excerpt = [new_sentence]
 
-        dc = complexity_measures.dale_chall_complexity(new_textblock)
-        fc = complexity_measures.flesch_complexity_score()
-        cm = get_closest_carec_score(text, )
-        sd = complexity_measures.mean_dependency_distance_sentence()
+        dc = com_m.standardized_dale_chall(com_m.dale_chall_complexity(new_textblock))
+        fc = com_m.standardized_flesch_ease(com_m.flesch_complexity_score(new_textblock))
+        cm = get_closest_carec_score(new_textblock)
+        sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock))
 
         draw_text('Sentence Complextity Score-', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
-        draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
+        # draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
         draw_text('Flesch:' + str(fc), text_font, 'black', 50, 150)
         draw_text('CAREC_M:' + str(cm), text_font, 'black', 50, 200)
         draw_text('Mean Dependency Distance:' + str(sd), text_font, 'black', 50, 250)
@@ -81,7 +101,7 @@ get_score()
 def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
     """Display a bar graph of the reading level accuracy of a given sentence."""
     if len(textblock.excerpt) == 1:
-        cm = get_closest_carec_score(textblock, csv_file)
+        cm = get_closest_carec_score(textblock)
     else:
         cm = textblock.carec_m
     fig = go.Figure(
@@ -90,22 +110,3 @@ def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, s
         layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
     )
     fig.show()
-
-
-def get_closest_carec_score(text: TextBlock, csv_file: str) -> float:
-    """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from csv_file"""
-    closest_txt_blk = text
-    dc = complexity_measures.dale_chall_complexity(text)
-    fc = complexity_measures.flesch_complexity_score(text)
-
-    pos_similar_txt_blk = data_processing.read_csv(csv_file)
-    min_diff = 10000
-    for textblock in pos_similar_txt_blk:
-        diff_dc = dc - textblock.dale_chall
-        diff_fc = fc - textblock.flesch_reading
-        diff = diff_dc + diff_fc
-
-        if diff <= min_diff:
-            closest_txt_blk = textblock
-
-    return closest_txt_blk.carec_m
