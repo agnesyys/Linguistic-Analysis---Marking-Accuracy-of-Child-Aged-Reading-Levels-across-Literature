@@ -197,6 +197,8 @@ class Sentence:
             if word_list[i] == word:
                 return i
 
+        return 0
+
 
 if __name__ == '__main__':
     import doctest

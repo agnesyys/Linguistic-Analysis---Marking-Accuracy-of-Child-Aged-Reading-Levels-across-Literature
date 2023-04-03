@@ -287,13 +287,15 @@ def mean_dependency_distance_sentence(sentence: Sentence) -> float:
     # Generally: this function calculates the distance between each word and its dependent in the sentence,
     # by traversing through the tree.
     # to calculate MDD, we begin with creating a dependency tree.
+    sentence.phrase = sentence.phrase.strip()
+    sentence.phrase = sentence.phrase.replace('\\', '')
     tree = ct.nltk_spacy_tree(sentence.phrase, False)
     # tree.pretty_print()
 
     # Then, for each word in the tree, which we refer to as the ith word based on sentence position
     # we need to get, for every subtree, the distance between root and children if there is only one child.
-
-    dependents = flatten(get_dependents(tree))
+    dependents = get_dependents(tree)
+    dependents = flatten(dependents)
     # we can now take every pair to get their distances, by finding their position in the sentence.
     # Since dependency tree is formed left to right, going from i =0  to i = len(sentence) - 1
     # # will maintain the order in case of duplicates

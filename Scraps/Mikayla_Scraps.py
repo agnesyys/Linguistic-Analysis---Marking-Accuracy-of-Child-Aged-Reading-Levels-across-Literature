@@ -39,11 +39,11 @@ def runner() -> None:
     fc = []
     dependency = []
     CAREC = []
-    for textblock in textblocks:
-        dc.append(textblock.dale_chall)
-        fc = textblock.flesch_reading
-        dependency.append(mean_dependency_distance(textblock, False))
-        CAREC.append(textblock.carec_m)
+    for i in range(0, 3):
+        dc.append(textblocks[i].dale_chall)
+        fc = textblocks[i].flesch_reading
+        dependency.append(mean_dependency_distance(textblocks[i], False))
+        CAREC.append(textblocks[i].carec_m)
         counter += 1
     avg_dc = sum(dc) / counter
     avg_fc = sum(fc) / counter

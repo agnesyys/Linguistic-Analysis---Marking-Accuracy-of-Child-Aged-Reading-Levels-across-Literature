@@ -1,5 +1,27 @@
 """This file allows user to input a sentence, then all the complexity scores will be shown, as well as a Plotly
  graph to display the results."""
+
+"""CSC111 Winter 2023
+
+Instructions (READ THIS FIRST!)
+===============================
+This file contains the implementations for our two main goals, as well as their visualizations.
+
+Goal 1: Runner so that the carec_m, flesch reading ease, dependency score, and dale chall are visualized,
+and can be run on the provided text from the dataset. We included our results of analyzing these results in our 
+written report.
+
+Goal 2: We used pygame to allow the user to input a sentence stripped of its punctuation and have its scores returned
+for every complexity measure implemented. This function also estimates the CAREC (crowd-sourced) score by matching text 
+with its closest equivalent in flesch reading ease and dale chall scores from the data set.
+
+Both return a plotly visualization of the scores for easy comparison.
+
+Copyright and Usage Information
+===============================
+
+This file is Copyright (c) 2023 Lana Wehbeh, Mikayla Pradeepan, and Agnes Yau.
+"""
 import pygame
 import sys
 import pygame_gui
@@ -16,7 +38,7 @@ pygame.init()
 width = 600
 height = 600
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Sentence Difficulty Score")
+pygame.display.set_caption("Sentence Difficulty Score Returned as Grade Level")
 clock = pygame.time.Clock()
 manager = pygame_gui.UIManager((width, height))
 text_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((120, 250), (350, 50)), manager=manager,
@@ -120,7 +142,7 @@ def show_text(text_to_show):
         cm = standardized_carec_score(get_closest_carec_score(new_textblock))
         sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock, True))
 
-        draw_text('Sentence Complextity Score', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
+        draw_text('Sentence Complextity Score as Grade Level', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
         draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
         draw_text('Flesch: ' + str(fc), text_font, 'black', 50, 150)
         draw_text('CAREC_M: ' + str(cm), text_font, 'black', 50, 200)
@@ -143,7 +165,7 @@ def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, s
                                             'Mean Dependency Distance', 'CAREC_M'])],
         layout_title_text="Reading Levels Accuracy Compared to CAREC M", )
     fig.update_layout(xaxis_title="Sentence Complexity Measures",
-                      yaxis_title="Score",
+                      yaxis_title="Score as Grade Level",
                       title_x=0.5)
     fig.show()
 
@@ -166,9 +188,6 @@ def get_score():
         pygame.display.update()
 
 
-get_score()
-
-
 def runner() -> None:
     """A runner of the data_set_novels.csv file."""
     textblocks = read_csv('data/data_set_novels.csv')
@@ -177,11 +196,12 @@ def runner() -> None:
     fc = []
     dependency = []
     carec = []
-    for textblock in textblocks:
-        dc.append(textblock.dale_chall)
-        fc = textblock.flesch_reading
-        dependency.append(com_m.mean_dependency_distance(textblock, False))
-        carec.append(textblock.carec_m)
+    for i in range(0, 3):
+        print([l.phrase for l in textblocks[i].excerpt])
+        dc.append(textblocks[i].dale_chall)
+        fc.append(textblocks[i].flesch_reading)
+        dependency.append(com_m.mean_dependency_distance(textblocks[i], False))
+        carec.append(textblocks[i].carec_m)
         counter += 1
     avg_dc = sum(dc) / counter
     avg_fc = sum(fc) / counter
@@ -194,3 +214,22 @@ def runner() -> None:
         layout_title_text="Reading Levels Accuracy Compared to CAREC M"
     )
     fig.show()
+
+
+if __name__ == '__main__':
+    # Testing Instructions:
+
+    # Goal 1: Running an analysis on the given data set, restricted for running time
+    runner()
+
+    # Goal 2: Running an input (please note that inserted text should not have any punctuation such as commas, periods,
+    # exclamation marks, colons, semicolons and questions marks)
+    get_score()
+
+
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'extra-imports': ["csv", "typing", "string", "create_tree"],  # the names (strs) of imported modules
+        'allowed-io': ["read_csv"]
+    })
