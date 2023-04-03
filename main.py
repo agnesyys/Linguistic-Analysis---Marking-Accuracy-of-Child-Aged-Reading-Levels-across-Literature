@@ -28,6 +28,7 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
+
 def get_closest_carec_score(text: TextBlock) -> float:
     """get a CAREC_M score by comparing Dale_Chall and Flesch complexitity scores from data_set_novels.csv"""
     closest_txt_blk = text
@@ -50,6 +51,7 @@ def get_closest_carec_score(text: TextBlock) -> float:
 
 def show_text(text_to_show):
     """after input sentence"""
+    counter = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -68,13 +70,15 @@ def show_text(text_to_show):
         cm = get_closest_carec_score(new_textblock)
         sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock, True))
 
-        draw_text('Sentence Complextity Score-', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
+        draw_text('Sentence Complextity Score', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
         # draw_text('Dale-Chall:' + str(dc), text_font, 'black', 50, 100)
-        draw_text('Flesch:' + str(fc), text_font, 'black', 50, 150)
-        draw_text('CAREC_M:' + str(cm), text_font, 'black', 50, 200)
-        draw_text('Mean Dependency Distance:' + str(sd), text_font, 'black', 50, 250)
+        draw_text('Flesch: ' + str(fc), text_font, 'black', 50, 150)
+        draw_text('CAREC_M: ' + str(cm), text_font, 'black', 50, 200)
+        draw_text('Mean Dependency Distance: ' + str(sd), text_font, 'black', 50, 250)
         # run plotly
-        display_reading_level_accuracy(new_textblock, dc, fc, sd)
+        if counter == 0:
+            display_reading_level_accuracy(new_textblock, dc, fc, sd)
+        counter += 1
         pygame.display.update()
 
 
