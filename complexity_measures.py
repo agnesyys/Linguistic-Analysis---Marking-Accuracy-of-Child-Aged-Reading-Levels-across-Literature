@@ -188,17 +188,24 @@ def standardized_flesch_ease(fe_score: float) -> float:
 # to tokenize words and create the tree for each sentence
 
 
-def mean_dependency_distance(text_block: TextBlock) -> float:
+def mean_dependency_distance(text_block: TextBlock, user_input: bool) -> float:
     """ Calculates the mean dependency distance (MDD) for a text block
     by finding the average MDD of each of its sentences.
 
     Notes on how MDD is determined in function mean_dependency_distance_sentence()
+
+    If this function is being used to generate the mean_dependency_distance of a user input, it acts on only one
+    sentence at a time, and so num_sentences is set to 1.
     """
     MDD_lists = []
     for sentence in text_block.excerpt:
         MDD_lists.append(mean_dependency_distance_sentence(sentence))
 
-    return sum(MDD_lists) / text_block.sentence_count
+    if user_input:
+        num_sentences = 1
+    else:
+        num_sentences = text_block.sentence_count
+    return sum(MDD_lists) / num_sentences
 
 
 def mean_dependency_distance_sentence(sentence: Sentence) -> float:
@@ -236,7 +243,6 @@ def mean_dependency_distance_sentence(sentence: Sentence) -> float:
     # Since dependency tree is formed left to right, going from i =0  to i = len(sentence) - 1
     # # will maintain the order in case of duplicates
     distances = []
-    print(dependents)
     for i in range(1, len(dependents) - 1, 2):
         # find position of each word in each sentence
         distances.append(abs(sentence.get_position_word(dependents[i])

@@ -124,6 +124,11 @@ class TextBlock:
             counter += 1
         return sum_so_far / counter
 
+    def num_sentences(self) -> int:
+        """Returns the number of sentences in the given text excerpt.
+        Note that this method is a simplified version and counts each period as a sentence.
+        """
+
 
 class Sentence:
     """
