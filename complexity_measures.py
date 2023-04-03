@@ -83,9 +83,8 @@ def dale_chall_word_list(csv_file: str) -> set[str]:
     return word_set
 
 
-
 def standardized_dale_chall(dc_score: float) -> float:
-    """Standardizes DC score using the following metric:
+    """Standardizes DC score using the following metric, note the end points are exclusive:
 
     DC Score Scale:
     4.9 and Below	Grade 4 and Below
@@ -97,11 +96,42 @@ def standardized_dale_chall(dc_score: float) -> float:
     10 and Above	Grades 16 and Above (College Graduate)
 
     Adjusted to 1.0 Scale:
-    TODO: figure out scale
-
+    0 - 0.2         Grade 4 and Below
+    0.2 - 0.45      Grades 5 - 6
+    0.45 - 0.65     Grades 7-8
+    0.65 - 0.8      Grades 9 - 10
+    0.8 - 0.9       Grades 11 - 12
+    0.9 - 1.0       Grades 13 - 15 (College)
+    1.0 +           Grades 16 and Above (College Graduate)
 
     """
-    return dc_score / 10
+    if dc_score >= 1:
+        return 16
+    elif 0.97 <= dc_score < 1:
+        return 15
+    elif 0.93 <= dc_score < 0.97:
+        return 14
+    elif 0.90 <= dc_score < 0.93:
+        return 13
+    elif 0.85 <= dc_score < 0.90:
+        return 12
+    elif 0.8 <= dc_score < 0.85:
+        return 11
+    elif 0.75 <= dc_score < 0.8:
+        return 10
+    elif 0.65 <= dc_score < 0.75:
+        return 9
+    elif 0.55 <= dc_score < 0.65:
+        return 8
+    elif 0.45 <= dc_score < 0.55:
+        return 7
+    elif 0.30 <= dc_score < 0.45:
+        return 6
+    elif 0.2 <= dc_score < 0.3:
+        return 5
+    else:
+        return 4
+
 
 
 # FLESCH READING EASE SCORE IMPLEMENTATION (complexity, syllable counter, standardizer)
@@ -164,7 +194,7 @@ def num_syllables(word: str) -> int:
 
     return syll_num
 
-def standardized_flesch_ease(fe_score: float) -> float:
+def standardized_flesch_ease(fe_score: float) -> int:
     """Standardizes FE score using the following metric:
 
     FE Scaling System
@@ -175,12 +205,32 @@ def standardized_flesch_ease(fe_score: float) -> float:
     50 - 60:  Grade 10 - 12
     30 - 50:  Grades 13 - 15 (College)
     0 - 30:   Grades 16 and Above (College Graduate)
-
-    Standardized Scoring:
-
-
     """
-    return fe_score
+    if fe_score >= 90:
+        return 5
+    elif 80 <= fe_score < 90:
+        return 6
+    elif 70 <= fe_score < 80:
+        return 7
+    elif 65 <= fe_score < 70:
+        return 8
+    elif 60 <= fe_score < 65:
+        return 9
+    elif 57 <= fe_score < 60:
+        return 10
+    elif 54 <= fe_score < 57:
+        return 11
+    elif 50 <= fe_score < 54:
+        return 12
+    elif 45 <= fe_score < 50:
+        return 13
+    elif 35 <= fe_score < 45:
+        return 14
+    elif 30 <= fe_score < 35:
+        return 15
+    else:
+        return 16
+
 
 # Dependency Distance Scoring (Text-block implementation, sentence scoring, dependency (tree parsing), flatten helper)
 
@@ -237,8 +287,7 @@ def mean_dependency_distance_sentence(sentence: Sentence) -> float:
     # Then, for each word in the tree, which we refer to as the ith word based on sentence position
     # we need to get, for every subtree, the distance between root and children if there is only one child.
 
-    dependents = []
-    dependents = flatten(get_dependents(tree), dependents)
+    dependents = flatten(get_dependents(tree))
     # we can now take every pair to get their distances, by finding their position in the sentence.
     # Since dependency tree is formed left to right, going from i =0  to i = len(sentence) - 1
     # # will maintain the order in case of duplicates
@@ -293,7 +342,7 @@ def get_dependents(tree: ct.nltk.tree) -> list[list[ct.nltk.tree]] | None:
     return dependents
 
 
-def flatten(nested_list: str | list, unnested1: list) -> list:
+def flatten(nested_list: str | list) -> list:
     """Mutate the given unnested list variable to store the items of the given nested list, unnested.
     """
     if isinstance(nested_list, str):
@@ -301,11 +350,11 @@ def flatten(nested_list: str | list, unnested1: list) -> list:
     else:
         unnested = []
         for sublist in nested_list:
-            unnested.extend(flatten(sublist, []))
+            unnested.extend(flatten(sublist))
     return unnested
 
 
-def standardized_syntax_score(syn_score: float) -> float:
+def standardized_syntax_score(syn_score: float) -> int:
     """Standardizes syntax dependency score using the following metric:
 
     MDD Scores follow the following scale:
@@ -314,8 +363,36 @@ def standardized_syntax_score(syn_score: float) -> float:
     1 - 2: Simple Sentence (4-6 Grade Level)       -> For context, this would be "The girl ate an apple."
     2 - 2.5: More Complex (Multiple Verbs)          -> "She fights like the wind when she is fighting angrily"
     2.543 - 3: Average Score (8-9th Grade Level)
-    3 - 4:  Increased Complexity (10 -12 Grade Level)
+    3 - 3.5:  Increased Complexity (10 -12 Grade Level)
+    3.5 - 4:  Significantly Increased Complexity (13 -15 Grade Level, College)
     4+:  Multiple Nested Clauses (Graduate Level; these are very rare and convoluted sentences)
 
     """
-    return syn_score
+    if syn_score < 1:
+        return 4
+    elif 1 <= syn_score < 1.5:
+        return 5
+    elif 1.5 <= syn_score < 2:
+        return 6
+    elif 2 <= syn_score < 2.5:
+        return 7
+    elif 2.5 <= syn_score < 2.7:
+        return 8
+    elif 2.7 <= syn_score < 3:
+        return 9
+    elif 3 <= syn_score < 3.2:
+        return 10
+    elif 3.2 <= syn_score < 3.4:
+        return 11
+    elif 3.4 <= syn_score < 3.5:
+        return 12
+    elif 3.5 <= syn_score < 3.7:
+        return 12
+    elif 3.7 <= syn_score < 3.8:
+        return 13
+    elif 3.8 <= syn_score < 3.9:
+        return 14
+    elif 3.9 <= syn_score < 4:
+        return 15
+    else:
+        return 16
