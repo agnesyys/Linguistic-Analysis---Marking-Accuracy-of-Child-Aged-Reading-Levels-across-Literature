@@ -20,8 +20,8 @@ Copyright and Usage Information
 
 This file is Copyright (c) 2023 Lana Wehbeh, Mikayla Pradeepan, and Agnes Yau.
 """
-from data_processing import TextBlock, Sentence
 import csv
+from data_processing import TextBlock, Sentence
 import create_tree as ct
 
 
@@ -60,7 +60,7 @@ def dale_chall_complexity(text: TextBlock) -> float:
         num_diff_words += num_unfamiliar
 
     # calculate average sentence length
-    num_words = sum(len(sentence.sentence_to_list()) for sentence in text.excerpt)
+    num_words = sum(len(sent.sentence_to_list()) for sent in text.excerpt)
     ASL = num_words / len(text.excerpt)
     PDW = num_diff_words / num_words
 
@@ -139,7 +139,6 @@ def standardized_dale_chall(dc_score: float) -> float:
         return 4
 
 
-
 # FLESCH READING EASE SCORE IMPLEMENTATION (complexity, syllable counter, standardizer)
 def flesch_complexity_score(text: TextBlock) -> float:
     """
@@ -163,7 +162,7 @@ def flesch_complexity_score(text: TextBlock) -> float:
     ASW = average_num_syllables / num_words
 
     # calculate average sentence length
-    num_words = sum(len(sentence.sentence_to_list()) for sentence in text.excerpt)
+    num_words = sum(len(sent.sentence_to_list()) for sent in text.excerpt)
     ASL = num_words / len(text.excerpt)
 
     reading_ease = 206.835 - 1.015 * ASL - 84.6 * ASW
@@ -190,15 +189,16 @@ def num_syllables(word: str) -> int:
     while i < length:
         # if word starts in a vowel, go until next consonant
         ending_conditions = (i == length - 2 and word[i] + word[i + 1] not in {"ed", "es"}) \
-                            or (i == length - 1 and word[i] != "e") or (i < length - 2) or \
-                            (i == length - 1 and word[i] == "e" and word[i-1] == "l")
+                        or (i == length - 1 and word[i] != "e") or (i < length - 2) or \
+                        (i == length - 1 and word[i] == "e" and word[i - 1] == "l")
 
-        if (word[i] in vowels) and (word[i-1] not in vowels) and ending_conditions:
+        if (word[i] in vowels) and (word[i - 1] not in vowels) and ending_conditions:
             syll_num += 1
 
         i += 1
 
     return syll_num
+
 
 def standardized_flesch_ease(fe_score: float) -> int:
     """Standardizes FE score using the following metric:
@@ -253,15 +253,15 @@ def mean_dependency_distance(text_block: TextBlock, user_input: bool) -> float:
     If this function is being used to generate the mean_dependency_distance of a user input, it acts on only one
     sentence at a time, and so num_sentences is set to 1.
     """
-    MDD_lists = []
+    mdd_lists = []
     for sentence in text_block.excerpt:
-        MDD_lists.append(mean_dependency_distance_sentence(sentence))
+        mdd_lists.append(mean_dependency_distance_sentence(sentence))
 
     if user_input:
         num_sentences = 1
     else:
         num_sentences = text_block.sentence_count
-    return sum(MDD_lists) / num_sentences
+    return sum(mdd_lists) / num_sentences
 
 
 def mean_dependency_distance_sentence(sentence: Sentence) -> float:
@@ -329,8 +329,8 @@ def get_dependents(tree: ct.nltk.tree) -> list[list[ct.nltk.tree]] | None:
 
     if len(tree.leaves()) >= 1:
         for leaf in tree.leaves():
-            subtrees_sans_original = [subtree for subtree in tree.subtrees() if subtree.label() != tree_root]
-            direct_leaf_condition = not any(leaf in subtree.leaves() for subtree in subtrees_sans_original)
+            subtrees_sans_original = [sub for sub in tree.subtrees() if sub.label() != tree_root]
+            direct_leaf_condition = not any(leaf in sub.leaves() for sub in subtrees_sans_original)
             if direct_leaf_condition:
                 dependents.append([tree_root, leaf])
 
@@ -403,6 +403,7 @@ def standardized_syntax_score(syn_score: float) -> int:
     else:
         return 16
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)
@@ -413,5 +414,7 @@ if __name__ == '__main__':
     # and then also test your methods manually in the console.
     import python_ta
     python_ta.check_all(config={
-        'max-line-length': 120
+        'max-line-length': 120,
+        'extra-imports': ["data_processing", "Sentence", "csv", "create_tree"],  # the names (strs) of imported modules
+        'allowed-io': ["dale_chall_word_list"]
     })
