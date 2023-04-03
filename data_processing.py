@@ -89,10 +89,10 @@ class TextBlock:
     category: Optional[str] = None
     location: Optional[str] = None
     excerpt: list[Sentence]
-    carec_m: Optional[float] = None
+    carec_m: Optional[float]
     sentence_count: Optional[int] = None
-    flesch_reading: Optional[float] = None
-    dale_chall: Optional[float] = None
+    flesch_reading: Optional[float]
+    dale_chall: Optional[float]
 
     def __init__(self,  excerpt: list[Sentence], id: Optional[int], author: Optional[str], title: Optional[str], url: Optional[str],
                  category: Optional[str], location: Optional[str], carec_m: Optional[float], sentence_count: Optional[int],
@@ -108,8 +108,8 @@ class TextBlock:
         self.excerpt = excerpt
         self.carec_m = carec_m
         self.sentence_count = sentence_count
-        self.flesch_reading: flesch_reading
-        self.dale_chall: dale_chall
+        self.flesch_reading = flesch_reading
+        self.dale_chall = dale_chall
 
     def average_sentence_length(self) -> float:
         """Returns the average number of words in a sentence.

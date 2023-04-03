@@ -48,7 +48,7 @@ def runner() -> None:
     avg_CAREC = sum(CAREC) / counter
 
     fig = go.Figure(
-            data=[go.Bar(y=[avg_dc, fc, sd, textblock.carec_m], x=['Dale-Chall Complexity', 'Flesch Complexity',
+            data=[go.Bar(y=[avg_dc, avg_fc, avg_dependency, textblock.carec_m], x=['Dale-Chall Complexity', 'Flesch Complexity',
                                                               'Syntatic Difficulty', 'CAREC_M'])],
             layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
         )
