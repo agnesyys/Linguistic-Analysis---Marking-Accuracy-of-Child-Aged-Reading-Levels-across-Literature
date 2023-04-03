@@ -39,8 +39,6 @@ def get_closest_carec_score(text: TextBlock) -> float:
     pos_similar_txt_blk = data_processing.read_csv('data/data_set_novels.csv')
     min_diff = 10000
     for textblock in pos_similar_txt_blk:
-        print(textblock.dale_chall)
-        print(textblock.flesch_reading)
         if (textblock.dale_chall and textblock.flesch_reading) is not None:
             diff_dc = dc - textblock.dale_chall
             diff_fc = fc - textblock.flesch_reading
@@ -48,8 +46,57 @@ def get_closest_carec_score(text: TextBlock) -> float:
 
             if diff <= min_diff:
                 closest_txt_blk = textblock
-
     return closest_txt_blk.carec_m
+
+
+def standardized_carec_score(score: float) -> float:
+    """Standardizes carec score using the following metric, note the end points are exclusive:
+
+        Carec Score Scale:
+        4.9 and Below	Grade 4 and Below
+        5.0 to 5.9	    Grades 5 - 6
+        6.0 to 6.9	    Grades 7 - 8
+        7.0 to 7.9	    Grades 9 - 10
+        8.0 to 8.9	    Grades 11 - 12
+        9.0 to 9.9	    Grades 13 - 15 (College)
+        10 and Above	Grades 16 and Above (College Graduate)
+
+        Adjusted to 1.0 Scale:
+        0 - 0.2         Grade 4 and Below
+        0.2 - 0.45      Grades 5 - 6
+        0.45 - 0.65     Grades 7-8
+        0.65 - 0.8      Grades 9 - 10
+        0.8 - 0.9       Grades 11 - 12
+        0.9 - 1.0       Grades 13 - 15 (College)
+        1.0 +           Grades 16 and Above (College Graduate)
+
+        """
+    if score >= 1:
+        return 16
+    elif 0.97 <= score < 1:
+        return 15
+    elif 0.93 <= score < 0.97:
+        return 14
+    elif 0.90 <= score < 0.93:
+        return 13
+    elif 0.85 <= score < 0.90:
+        return 12
+    elif 0.8 <= score < 0.85:
+        return 11
+    elif 0.75 <= score < 0.8:
+        return 10
+    elif 0.65 <= score < 0.75:
+        return 9
+    elif 0.55 <= score < 0.65:
+        return 8
+    elif 0.45 <= score < 0.55:
+        return 7
+    elif 0.30 <= score < 0.45:
+        return 6
+    elif 0.2 <= score < 0.3:
+        return 5
+    else:
+        return 4
 
 
 def show_text(text_to_show):
@@ -70,7 +117,7 @@ def show_text(text_to_show):
 
         dc = com_m.standardized_dale_chall(com_m.dale_chall_complexity(new_textblock))
         fc = com_m.standardized_flesch_ease(com_m.flesch_complexity_score(new_textblock))
-        cm = get_closest_carec_score(new_textblock)
+        cm = standardized_carec_score(get_closest_carec_score(new_textblock))
         sd = com_m.standardized_syntax_score(com_m.mean_dependency_distance(new_textblock, True))
 
         draw_text('Sentence Complextity Score', pygame.font.SysFont('Arial', 40), 'black', 50, 30)
@@ -88,9 +135,9 @@ def show_text(text_to_show):
 def display_reading_level_accuracy(textblock: TextBlock, dc: float, fc: float, sd: float) -> None:
     """Display a bar graph of the reading level accuracy of a given sentence."""
     if len(textblock.excerpt) == 1:
-        cm = get_closest_carec_score(textblock)
+        cm = standardized_carec_score(get_closest_carec_score(textblock))
     else:
-        cm = textblock.carec_m
+        cm = standardized_carec_score(textblock.carec_m)
     fig = go.Figure(
         data=[go.Bar(y=[dc, fc, sd, cm], x=['Dale-Chall Complexity', 'Flesch Complexity',
                                             'Mean Dependency Distance', 'CAREC_M'])],
