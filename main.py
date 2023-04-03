@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 
 import data_processing
 from data_processing import TextBlock, Sentence
+from data_processing import read_csv
 
 import complexity_measures
 com_m = complexity_measures
@@ -119,3 +120,30 @@ def get_score():
 
 
 get_score()
+
+
+def runner() -> None:
+    """A runner of the data_set_novels.csv file."""
+    textblocks = read_csv('data/data_set_novels.csv')
+    counter = 0
+    dc = []
+    fc = []
+    dependency = []
+    carec = []
+    for textblock in textblocks:
+        dc.append(textblock.dale_chall)
+        fc = textblock.flesch_reading
+        dependency.append(com_m.mean_dependency_distance(textblock, False))
+        carec.append(textblock.carec_m)
+        counter += 1
+    avg_dc = sum(dc) / counter
+    avg_fc = sum(fc) / counter
+    avg_dependency = sum(dependency) / counter
+    avg_carec = sum(carec) / counter
+
+    fig = go.Figure(
+        data=[go.Bar(y=[avg_dc, avg_fc, avg_dependency, avg_carec], x=['Dale-Chall Complexity', 'Flesch Complexity',
+                                                                       'Mean Dependency Distance', 'CAREC_M'])],
+        layout_title_text="Reading Levels Accuracy Compared to CAREC M"
+    )
+    fig.show()

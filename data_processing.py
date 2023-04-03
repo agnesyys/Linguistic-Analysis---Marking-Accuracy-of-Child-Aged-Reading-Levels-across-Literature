@@ -84,7 +84,7 @@ class TextBlock:
     id: Optional[int] = None
     author: Optional[str] = None
     title: Optional[str] = None
-    url: Optional[str] = None
+    url: Optional[str]
     pub_year: Optional[int] = None
     category: Optional[str] = None
     location: Optional[str] = None
@@ -94,9 +94,10 @@ class TextBlock:
     flesch_reading: Optional[float]
     dale_chall: Optional[float]
 
-    def __init__(self,  excerpt: list[Sentence], id: Optional[int], author: Optional[str], title: Optional[str], url: Optional[str],
-                 category: Optional[str], location: Optional[str], carec_m: Optional[float], sentence_count: Optional[int],
-                 flesch_reading: Optional[float], dale_chall: Optional[float], pub_year: Optional[int] = 0):
+    def __init__(self,  excerpt: list[Sentence], id: Optional[int], author: Optional[str], title: Optional[str],
+                 url: Optional[str], category: Optional[str], location: Optional[str], carec_m: Optional[float],
+                 sentence_count: Optional[int], flesch_reading: Optional[float], dale_chall: Optional[float],
+                 pub_year: Optional[int] = 0):
         """initializes the instance attributes of TextBlock"""
         self.id = id
         self.author = author

@@ -1,9 +1,12 @@
 """Storage for Mikayla in case of Git Shenanigans"""
-# import plotly.graph_objects as go
+import plotly.graph_objects as go
 import nltk
+import courseProject.data_processing as data
 from courseProject.data_processing import read_csv
 from courseProject.data_processing import TextBlock, Sentence
 from courseProject.complexity_measures import mean_dependency_distance
+
+
 # from courseProject import complexity_measures as complex
 
 
@@ -48,8 +51,8 @@ def runner() -> None:
     avg_CAREC = sum(CAREC) / counter
 
     fig = go.Figure(
-            data=[go.Bar(y=[avg_dc, avg_fc, avg_dependency, textblock.carec_m], x=['Dale-Chall Complexity', 'Flesch Complexity',
-                                                              'Syntatic Difficulty', 'CAREC_M'])],
-            layout_title_text="Reading Levels Accuracy Compared to CAREC M of '" + textblock.title + "'"
-        )
-        fig.show()
+        data=[go.Bar(y=[avg_dc, avg_fc, avg_dependency, avg_CAREC], x=['Dale-Chall Complexity', 'Flesch Complexity',
+                                                                       'Mean Dependency Distance', 'CAREC_M'])],
+        layout_title_text="Reading Levels Accuracy Compared to CAREC M"
+    )
+    fig.show()
