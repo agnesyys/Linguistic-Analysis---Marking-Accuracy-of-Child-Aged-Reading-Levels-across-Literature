@@ -1,4 +1,5 @@
-""""Main file for runner functions and user input"""
+"""This file allows user to input a sentence, then all the complexity scores will be shown, as well as a Plotly
+ graph to display the results."""
 import pygame
 import sys
 import pygame_gui
