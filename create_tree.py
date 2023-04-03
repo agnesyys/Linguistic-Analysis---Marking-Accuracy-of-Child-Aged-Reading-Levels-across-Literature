@@ -1,4 +1,14 @@
-"""Creating a tree from a sentence using spacy and nltk"""
+"""CSC111 Winter 2023
+
+Instructions (READ THIS FIRST!)
+===============================
+This file contains the implementations for the nltk implementation of creating a tree, using nlp's tokenizers
+
+Copyright and Usage Information
+===============================
+
+This file is Copyright (c) 2023 Lana Wehbeh, Mikayla Pradeepan, and Agnimport nltk
+"""
 import nltk
 import spacy
 from nltk import Tree
@@ -7,11 +17,10 @@ from typing import Any
 spacy.cli.download("en_core_web_sm")
 nlp = spacy.load("en_core_web_sm")
 
-
 def nltk_spacy_tree(sentence: str, attr_included: bool) -> nltk.tree:
     """Visualize the SpaCy dependency tree with nltk.tree
 
-    if attr_included is True, then part of speech and syntatic dependency are included
+    if attr_included is True, then part of speech and syntactic dependency are included
     if attr_included is False, then only the words is included in the nltk.tree
     """
     # gets all the tokenized info
