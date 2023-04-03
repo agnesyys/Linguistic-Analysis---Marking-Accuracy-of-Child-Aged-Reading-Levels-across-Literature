@@ -1,4 +1,17 @@
-"""Document that processes each text excerpt, and stores attributes"""
+"""CSC111 Winter 2023
+
+Instructions (READ THIS FIRST!)
+===============================
+This file contains the implementations for our file readers, and classes TextBlock and Sentence.
+
+There is nothing to run here, these are mostly just supports for our complexity measures functions (the classes), and
+our visualizers in main.py.
+
+Copyright and Usage Information
+===============================
+
+This file is Copyright (c) 2023 Lana Wehbeh, Mikayla Pradeepan, and Agnes Yau.
+"""
 from __future__ import annotations
 import csv
 from typing import Optional
@@ -125,11 +138,6 @@ class TextBlock:
             counter += 1
         return sum_so_far / counter
 
-    def num_sentences(self) -> int:
-        """Returns the number of sentences in the given text excerpt.
-        Note that this method is a simplified version and counts each period as a sentence.
-        """
-
 
 class Sentence:
     """
@@ -188,3 +196,19 @@ class Sentence:
         for i in range(0, len(word_list)):
             if word_list[i] == word:
                 return i
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run both pytest and PythonTA,
+    # and then also test your methods manually in the console.
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'extra-imports': ["csv", "typing", "string", "create_tree"],  # the names (strs) of imported modules
+        'allowed-io': ["read_csv"]
+    })
