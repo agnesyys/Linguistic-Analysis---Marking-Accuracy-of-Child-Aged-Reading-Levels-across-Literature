@@ -224,24 +224,26 @@ def mean_dependency_distance_sentence(sentence: Sentence) -> float:
     # Generally: this function calculates the distance between each word and its dependent in the sentence,
     # by traversing through the tree.
     # to calculate MDD, we begin with creating a dependency tree.
-    tree = ct.nltk_spacy_tree(sentence, False)
+    tree = ct.nltk_spacy_tree(sentence.phrase, False)
     # tree.pretty_print()
 
     # Then, for each word in the tree, which we refer to as the ith word based on sentence position
     # we need to get, for every subtree, the distance between root and children if there is only one child.
 
     dependents = []
-    flatten(get_dependents(tree), dependents)
+    dependents = flatten(get_dependents(tree), dependents)
     # we can now take every pair to get their distances, by finding their position in the sentence.
     # Since dependency tree is formed left to right, going from i =0  to i = len(sentence) - 1
     # # will maintain the order in case of duplicates
     distances = []
-    for i in range(0, sentence.word_count, 2):
-        distances.append(abs(sentence.phrase.index(dependents[i], i - 1)
-                             - sentence.phrase.index(dependents[i + 1], i - 1)))
+    print(dependents)
+    for i in range(1, len(dependents) - 1, 2):
+        # find position of each word in each sentence
+        distances.append(abs(sentence.get_position_word(dependents[i])
+                             - sentence.get_position_word(dependents[i - 1])))
 
     # lastly, summ all DDs and divide by num of words in sentence
-    return sum(distances) * 1 / (sentence.word_count- 1)
+    return sum(distances) * 1 / (sentence.word_count - 1)
 
 
 def get_dependents(tree: ct.nltk.tree) -> list[list[ct.nltk.tree]] | None:
@@ -285,13 +287,16 @@ def get_dependents(tree: ct.nltk.tree) -> list[list[ct.nltk.tree]] | None:
     return dependents
 
 
-def flatten(nested_list: str | list, unnested: list) -> None:
+def flatten(nested_list: str | list, unnested1: list) -> list:
     """Mutate the given unnested list variable to store the items of the given nested list, unnested.
     """
     if isinstance(nested_list, str):
-        unnested.append(nested_list)
+        return [nested_list]
     else:
-        unnested.append(flatten(sublist, []) for sublist in nested_list)
+        unnested = []
+        for sublist in nested_list:
+            unnested.extend(flatten(sublist, []))
+    return unnested
 
 
 def standardized_syntax_score(syn_score: float) -> float:

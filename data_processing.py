@@ -174,3 +174,11 @@ class Sentence:
         #   temp = self.phrase.replace(i, '')
         temp = self.phrase.translate(str.maketrans('', '', string.punctuation))
         return temp.split(' ')
+
+    def get_position_word(self, word: str) -> int:
+        """returns the index of the first iteration of this word."""
+        word_list = self.sentence_to_list()
+
+        for i in range(0, len(word_list)):
+            if word_list[i] == word:
+                return i
