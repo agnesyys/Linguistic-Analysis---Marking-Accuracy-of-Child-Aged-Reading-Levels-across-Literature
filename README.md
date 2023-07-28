@@ -38,4 +38,5 @@ Crossley, Scott, et al. “The Commonlit Ease of Readability (CLEAR) Corpus.” 
 “Free Dale-Chall Readability Formula with Word List - Original and Revised Versions.” Readability Formulas, https://readabilityformulas.com/free-dale-chall-test.php. Accessed 7 Mar. 2023.
 
 Hudson, Richard, “Measuring syntactic difficulty.” Sept. 1995, https://dickhudson.com/wp-content/uploads/2013/07/Difficulty.pdf. Accessed 7 Mar. 2023.
+
 Liu, Kanglong and Mohammad Afzaal, “Syntactic complexity in translated and non-translated texts: A corpusbased study of simplification.” PLOS ONE, 24 June 2021, https://doi.org/10.1371/journal.pone.0253454. Accessed 7 Mar. 2023.
